@@ -59,7 +59,7 @@
     <button data-t="prog" class="on">進度</button>
     <button data-t="todo">待辦</button>
     <button data-t="meet">會議紀錄</button>
-    <button data-t="pay">給錢紀錄</button>
+    <button data-t="pay">付款紀錄</button>
   </nav>
 
   <section id="prog" class="on"></section>
@@ -73,7 +73,7 @@ function render(){
 const $ = id => document.getElementById(id);
 const money = n => "$" + n.toLocaleString("en-US");
 const md = d => { const [, m, day] = d.split("-"); return +m + "/" + +day; };
-const tag = done => done ? '<span class="tag ok">冠竹完成</span>' : '<span class="tag wait">待完成</span>';
+const tag = done => done ? '<span class="tag ok">完成</span>' : '<span class="tag wait">待完成</span>';
 const MAX_MEET = 2;
 
 $("upd").textContent = "更新 " + DATA.updated;
@@ -85,8 +85,8 @@ const openTodos = DATA.todos.filter(t => !t.done).length;
 
 $("stats").innerHTML = [
   [DATA.vendors.length, "廠商"],
-  [money(paid), "已給"],
-  [money(unpaid), "待給"],
+  [money(paid), "已付"],
+  [money(unpaid), "待付"],
   [openTodos, "待辦"]
 ].map(([v, l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
 
@@ -121,7 +121,7 @@ $("pay").innerHTML = `<table>
   <tr><th>日期</th><th>廠商</th><th>項目</th><th>金額</th><th>狀態</th></tr>
   ${pays.map(p => `<tr><td class="n">${md(p.date)}</td><td>${p.vendor}</td><td>${p.item}</td>
     <td class="n">${money(p.amount)}</td>
-    <td>${p.paid ? '<span class="tag ok">已給</span>' : '<span class="tag wait">待給</span>'}</td></tr>`).join("")}
+    <td>${p.paid ? '<span class="tag ok">已付</span>' : '<span class="tag wait">待付</span>'}</td></tr>`).join("")}
 </table>
 <div class="fee">
   <div>前半 <b>$1,000</b></div>

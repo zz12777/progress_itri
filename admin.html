@@ -73,12 +73,12 @@
     </div>
   </div>
 
-  <div class="card"><h2>給錢紀錄</h2><div id="pay"></div>
+  <div class="card"><h2>付款紀錄</h2><div id="pay"></div>
     <div class="add">
       <input type="date" id="pDate"><input id="pVendor" placeholder="廠商" list="vlist">
       <select id="pItem"><option>前半</option><option>後半</option><option>會議加價</option><option>其他</option></select>
       <input class="num" id="pAmt" type="number" value="1000" step="100">
-      <select id="pPaid"><option value="0">待給</option><option value="1">已給</option></select>
+      <select id="pPaid"><option value="0">待付</option><option value="1">已付</option></select>
       <button class="btn ghost" id="pAdd">新增</button>
     </div>
   </div>
@@ -143,7 +143,7 @@ function render() {
     ${D.vendors.map((v, i) => {
       const c = D.meetings.filter(m => m.vendor === v.name).length;
       return `<tr><td><b>${esc(v.name)}</b></td>
-      ${v.progress.map((p, k) => `<td>${tagBtn(p, "冠竹完成", "待完成", `data-a="prog" data-i="${i}" data-k="${k}"`)}</td>`).join("")}
+      ${v.progress.map((p, k) => `<td>${tagBtn(p, "完成", "待完成", `data-a="prog" data-i="${i}" data-k="${k}"`)}</td>`).join("")}
       <td style="${c > 2 ? "color:var(--bad);font-weight:600" : ""}">${c} / 2</td>
       <td>${delBtn(`data-a="delV" data-i="${i}"`)}</td></tr>`;
     }).join("")}</table>`;
@@ -152,7 +152,7 @@ function render() {
 
   $("todo").innerHTML = `<table><tr><th>日期</th><th>廠商</th><th>事項</th><th>狀態</th><th></th></tr>
     ${idx(D.todos).sort((a, b) => a[0].done - b[0].done).map(([t, i]) => `<tr><td>${md(t.date)}</td><td>${esc(t.vendor)}</td><td class="wrapc">${esc(t.item)}</td>
-      <td>${tagBtn(t.done, "冠竹完成", "待完成", `data-a="todo" data-i="${i}"`)}</td><td>${delBtn(`data-a="delT" data-i="${i}"`)}</td></tr>`).join("")}</table>`;
+      <td>${tagBtn(t.done, "完成", "待完成", `data-a="todo" data-i="${i}"`)}</td><td>${delBtn(`data-a="delT" data-i="${i}"`)}</td></tr>`).join("")}</table>`;
 
   $("meet").innerHTML = `<table><tr><th>日期</th><th>對象</th><th>小時</th><th>內容</th><th></th></tr>
     ${idx(D.meetings).map(([m, i]) => `<tr><td>${md(m.date)}</td><td>${esc(m.vendor)}</td><td>${m.hours}</td>
@@ -160,7 +160,7 @@ function render() {
 
   $("pay").innerHTML = `<table><tr><th>日期</th><th>廠商</th><th>項目</th><th>金額</th><th>狀態</th><th></th></tr>
     ${idx(D.payments).map(([p, i]) => `<tr><td>${md(p.date)}</td><td>${esc(p.vendor)}</td><td>${esc(p.item)}</td><td>$${p.amount.toLocaleString("en-US")}</td>
-      <td>${tagBtn(p.paid, "已給", "待給", `data-a="pay" data-i="${i}"`)}</td><td>${delBtn(`data-a="delP" data-i="${i}"`)}</td></tr>`).join("")}</table>`;
+      <td>${tagBtn(p.paid, "已付", "待付", `data-a="pay" data-i="${i}"`)}</td><td>${delBtn(`data-a="delP" data-i="${i}"`)}</td></tr>`).join("")}</table>`;
 }
 
 document.addEventListener("click", e => {
@@ -170,7 +170,7 @@ document.addEventListener("click", e => {
   else if (a === "todo") D.todos[i].done = !D.todos[i].done;
   else if (a === "pay") D.payments[i].paid = !D.payments[i].paid;
   else {
-    const map = { delV: ["vendors", "廠商"], delT: ["todos", "待辦"], delM: ["meetings", "會議"], delP: ["payments", "給錢紀錄"] }[a];
+    const map = { delV: ["vendors", "廠商"], delT: ["todos", "待辦"], delM: ["meetings", "會議"], delP: ["payments", "付款紀錄"] }[a];
     if (!confirm("刪除這筆" + map[1] + "？")) return;
     D[map[0]].splice(i, 1);
   }
