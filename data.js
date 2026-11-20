@@ -16,7 +16,8 @@ const DATA = {
         1,
         1,
         0
-      ]
+      ],
+      "meet": 0
     },
     {
       "name": "恆源",
@@ -26,7 +27,8 @@ const DATA = {
         1,
         1,
         0
-      ]
+      ],
+      "meet": 0
     },
     {
       "name": "老獵人",
@@ -36,7 +38,8 @@ const DATA = {
         1,
         0,
         0
-      ]
+      ],
+      "meet": 0
     },
     {
       "name": "京旺",
@@ -46,7 +49,8 @@ const DATA = {
         1,
         0,
         0
-      ]
+      ],
+      "meet": 0
     },
     {
       "name": "鼎珍食品",
@@ -56,7 +60,8 @@ const DATA = {
         0,
         0,
         0
-      ]
+      ],
+      "meet": 0
     }
   ],
   "meetings": [
@@ -66,8 +71,7 @@ const DATA = {
       "hours": 1,
       "notes": [
         "京旺、老獵人前半上傳網頁",
-        "提供3個AI工具給鼎珍食品挑選",
-        "給冠竹 $2,000"
+        "提供3個AI工具給鼎珍食品挑選"
       ]
     }
   ],
@@ -76,35 +80,38 @@ const DATA = {
       "date": "2026-11-20",
       "vendor": "京旺",
       "item": "前半報告上傳網頁",
-      "done": false
+      "done": false,
+      "due": ""
     },
     {
       "date": "2026-11-20",
       "vendor": "老獵人",
       "item": "前半報告上傳網頁",
-      "done": false
+      "done": false,
+      "due": ""
     },
     {
       "date": "2026-11-20",
       "vendor": "鼎珍食品",
       "item": "提供3個AI工具候選",
-      "done": false
+      "done": false,
+      "due": ""
     }
   ],
   "payments": [
     {
       "date": "2026-07-17",
-      "vendor": "當歸小舖",
-      "item": "前半",
-      "amount": 1000,
-      "paid": true
+      "items": [
+        "當歸小舖 前半"
+      ],
+      "amount": 1000
     },
     {
       "date": "2026-10-03",
-      "vendor": "恆源",
-      "item": "前半",
-      "amount": 1000,
-      "paid": true
+      "items": [
+        "恆源 前半"
+      ],
+      "amount": 1000
     }
   ]
 };
