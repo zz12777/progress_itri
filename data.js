@@ -17,7 +17,7 @@ const DATA = {
         1,
         0
       ],
-      "meet": 0
+      "meet": 1
     },
     {
       "name": "恆源",
@@ -28,7 +28,7 @@ const DATA = {
         1,
         0
       ],
-      "meet": 0
+      "meet": 1
     },
     {
       "name": "老獵人",
@@ -39,7 +39,7 @@ const DATA = {
         0,
         0
       ],
-      "meet": 0
+      "meet": 1
     },
     {
       "name": "京旺",
@@ -50,13 +50,13 @@ const DATA = {
         0,
         0
       ],
-      "meet": 0
+      "meet": 1
     },
     {
       "name": "鼎珍食品",
       "progress": [
         1,
-        0,
+        1,
         0,
         0,
         0
@@ -81,20 +81,20 @@ const DATA = {
       "vendor": "京旺",
       "item": "前半報告上傳網頁",
       "done": false,
-      "due": ""
+      "due": "2026-11-24"
     },
     {
       "date": "2026-11-20",
       "vendor": "老獵人",
       "item": "前半報告上傳網頁",
       "done": false,
-      "due": ""
+      "due": "2026-11-24"
     },
     {
       "date": "2026-11-20",
       "vendor": "鼎珍食品",
       "item": "提供3個AI工具候選",
-      "done": false,
+      "done": true,
       "due": ""
     }
   ],
