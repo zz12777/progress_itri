@@ -48,8 +48,7 @@
   .owe .amt.zero{color:var(--ok)}
   .owe .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
   .sub{padding:12px 14px 0;font-size:13px;color:var(--mute);font-weight:600}
-  .fee{padding:14px 18px;display:flex;gap:28px;flex-wrap:wrap;border-top:1px solid var(--line)}
-  .fee div b{font-variant-numeric:tabular-nums}
+  .cash{display:inline-block;margin-left:5px;width:18px;height:18px;line-height:18px;text-align:center;border-radius:50%;background:var(--waitbg);color:var(--wait);font-size:12px;font-weight:700}
   @media (max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
@@ -80,9 +79,10 @@ const $ = id => document.getElementById(id);
 const money = n => "$" + n.toLocaleString("en-US");
 const md = d => { if (!d) return "—"; const [, m, day] = d.split("-"); return +m + "/" + +day; };
 const tag = done => done ? '<span class="tag ok">完成</span>' : '<span class="tag wait">待完成</span>';
-const MAX_MEET = 2, FEE = 1000, HALVES = [["前半", 3], ["後半", 4]];
+const FEE = 1000, HALVES = [["前半", 3], ["後半", 4]];
 const today = new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10);
 
+const PAYK = HALVES.map(h => h[1]);
 function render(){
 const D = DATA;
 $("upd").textContent = "更新 " + D.updated;
@@ -102,12 +102,11 @@ $("stats").innerHTML = [
 
 // 進度
 $("prog").innerHTML = `<table>
-  <tr><th>廠商</th>${D.stages.map(s => `<th>${s}</th>`).join("")}<th>線上會議</th></tr>
+  <tr><th>廠商</th>${D.stages.map((s, k) => `<th>${s}${PAYK.includes(k) ? '<span class="cash">$</span>' : ""}</th>`).join("")}<th>線上會議</th></tr>
   ${D.vendors.map(v => {
-    const c = v.meet || 0;
     return `<tr><td><b>${v.name}</b></td>
       ${v.progress.map(p => `<td>${tag(p)}</td>`).join("")}
-      <td class="n ${c > MAX_MEET ? "over" : ""}">${c} / ${MAX_MEET}</td></tr>`;
+      <td class="n">${v.meet || 0}</td></tr>`;
   }).join("")}
 </table>`;
 
@@ -140,11 +139,7 @@ ${pays.length ? `<table>
   <tr><th>日期</th><th>項目</th><th>金額</th></tr>
   ${pays.map(p => `<tr><td class="n">${md(p.date)}</td><td class="w">${p.items.join("、")}</td><td class="n">${money(p.amount)}</td></tr>`).join("")}
 </table>` : '<div class="empty">無</div>'}
-<div class="fee">
-  <div>前半 <b>$1,000</b></div>
-  <div>後半 <b>$1,000</b></div>
-  <div>每家線上會議 <b>${MAX_MEET} 次</b>（1小時/次），超過另計</div>
-</div>`;
+`;
 }
 
 $("nav").onclick = e => {

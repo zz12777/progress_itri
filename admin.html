@@ -21,6 +21,7 @@
   td.w{white-space:normal}
   .tag{display:inline-block;padding:3px 10px;border-radius:999px;border:none;font:inherit;font-size:13px;cursor:pointer}
   .ok{background:var(--okbg);color:var(--ok)} .wait{background:var(--waitbg);color:var(--wait)}
+  .cash{display:inline-block;margin-left:5px;width:18px;height:18px;line-height:18px;text-align:center;border-radius:50%;background:var(--waitbg);color:var(--wait);font-size:12px;font-weight:700}
   .late{color:var(--bad);font-weight:600}
   .del{border:none;background:none;color:var(--mute);cursor:pointer;font-size:16px;padding:0 4px}
   .del:hover{color:var(--bad)}
@@ -104,7 +105,7 @@
 <script>
 const REPO = "zz12777/progress_itri", FILE = "data.js", BRANCH = "main";
 const API = `https://api.github.com/repos/${REPO}/contents/${FILE}`;
-const FEE = 1000, MAX_MEET = 2, HALVES = [["前半", 3], ["後半", 4]];
+const FEE = 1000, HALVES = [["前半", 3], ["後半", 4]];
 const $ = id => document.getElementById(id);
 const md = d => { if (!d) return "—"; const [, m, day] = d.split("-"); return +m + "/" + +day; };
 const today = () => new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10);
@@ -157,10 +158,10 @@ function render() {
   $("tVendor").innerHTML = opts(vNames);
   $("mVendor").innerHTML = opts(["內部", ...vNames]);
 
-  $("prog").innerHTML = `<table><tr><th>廠商</th>${D.stages.map(s => `<th>${s}</th>`).join("")}<th>線上會議</th><th></th></tr>
+  $("prog").innerHTML = `<table><tr><th>廠商</th>${D.stages.map((s, k) => `<th>${s}${HALVES.some(h => h[1] === k) ? '<span class="cash">$</span>' : ""}</th>`).join("")}<th>線上會議</th><th></th></tr>
     ${D.vendors.map((v, i) => `<tr><td><b>${esc(v.name)}</b></td>
       ${v.progress.map((p, k) => `<td>${tagBtn(p, "完成", "待完成", `data-a="prog" data-i="${i}" data-k="${k}"`)}</td>`).join("")}
-      <td><input class="num ${v.meet > MAX_MEET ? "late" : ""}" type="number" min="0" value="${v.meet}" data-c="meet" data-i="${i}"> / ${MAX_MEET}</td>
+      <td><input class="num" type="number" min="0" value="${v.meet}" data-c="meet" data-i="${i}"></td>
       <td>${delBtn(`data-a="delV" data-i="${i}"`)}</td></tr>`).join("")}</table>`;
 
   const t0 = today();
