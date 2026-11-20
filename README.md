@@ -1,18 +1,14 @@
 # 進度管理_冠竹
 
-## 上線（一次）
-1. GitHub 新建 repo，上傳 `index.html`、`data.js`
-2. Settings → Pages → Branch 選 `main` / `root` → Save
-3. 約 1 分鐘後網址：`https://<帳號>.github.io/<repo名稱>/`，傳給對方
+- 觀看頁：https://zz12777.github.io/progress_itri/
+- 管理頁：https://zz12777.github.io/progress_itri/admin.html
+
+## 管理頁第一次登入：建立 Token（一次）
+1. 打開 https://github.com/settings/personal-access-tokens/new
+2. Token name 隨意；Expiration 選最長
+3. Repository access → Only select repositories → 選 `progress_itri`
+4. Permissions → Repository permissions → **Contents** 改成 **Read and write**
+5. Generate token，複製後貼到管理頁登入
 
 ## 日常更新
-在 GitHub 打開 `data.js` → 鉛筆圖示編輯 → Commit changes，約 1 分鐘後網頁更新。
-
-- 進度：`progress` 改 `0`→`1`
-- 待辦完成：`done: false` → `true`
-- 已給錢：`paid: false` → `true`
-- 新增會議／待辦／給錢：複製一筆 `{ ... },` 貼上修改
-- 記得改 `updated` 日期
-
-## 注意
-免費帳號的 GitHub Pages 需要 public repo，任何人知道網址就看得到（含金額）。
+打開管理頁 → 點狀態切換／填表新增／✕ 刪除 → 按「儲存上線」，約 1 分鐘後觀看頁更新。

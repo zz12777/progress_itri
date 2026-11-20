@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>管理_進度管理_冠竹</title>
+<style>
+  :root{--bg:#f6f5f2;--card:#fff;--ink:#1f2328;--mute:#6b7280;--line:#e6e3dc;
+    --ok:#1f7a5a;--okbg:#e3f3ec;--wait:#8a6d1f;--waitbg:#fbf1d6;--bad:#b42318}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;font-size:15px;line-height:1.5}
+  .wrap{max-width:1000px;margin:0 auto;padding:24px 16px 120px}
+  h1{font-size:22px;margin:0 0 18px}
+  h2{font-size:16px;margin:0;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:18px;overflow-x:auto}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:top}
+  th{font-size:13px;color:var(--mute);font-weight:600}
+  td.wrapc{white-space:normal}
+  .tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:13px;cursor:pointer;border:none;font:inherit;font-size:13px}
+  .ok{background:var(--okbg);color:var(--ok)} .wait{background:var(--waitbg);color:var(--wait)}
+  .del{border:none;background:none;color:var(--mute);cursor:pointer;font-size:16px;padding:0 4px}
+  .del:hover{color:var(--bad)}
+  .add{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px;background:#faf9f6;align-items:flex-start}
+  input,select,textarea{font:inherit;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:#fff}
+  textarea{min-width:260px;flex:1;min-height:38px}
+  input[type=date]{width:150px} input.num{width:100px}
+  button.btn{font:inherit;padding:7px 16px;border-radius:8px;border:1px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer}
+  button.ghost{background:#fff;color:var(--ink);border-color:var(--line)}
+  .bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);
+    padding:12px 16px;display:flex;justify-content:center;gap:12px;align-items:center}
+  .bar .btn{padding:10px 28px;font-size:16px}
+  #msg{font-size:14px;color:var(--mute)}
+  #msg.err{color:var(--bad)} #msg.good{color:var(--ok)}
+  .dirty #save{background:var(--bad);border-color:var(--bad)}
+  #login{max-width:460px;margin:60px auto;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px}
+  #login input{width:100%;margin:10px 0 14px}
+  a{color:inherit}
+</style>
+</head>
+<body>
+
+<div id="login" hidden>
+  <h1>管理登入</h1>
+  <input id="tok" type="password" placeholder="GitHub Token">
+  <button class="btn" id="tokSave">登入</button>
+  <div id="loginMsg" style="margin-top:10px;color:var(--bad)"></div>
+</div>
+
+<div class="wrap" id="app" hidden>
+  <h1>管理_進度管理_冠竹</h1>
+
+  <div class="card"><h2>進度</h2><div id="prog"></div>
+    <div class="add"><input id="vName" placeholder="新廠商名稱"><button class="btn ghost" id="vAdd">新增廠商</button></div>
+  </div>
+
+  <div class="card"><h2>待辦</h2><div id="todo"></div>
+    <div class="add">
+      <input type="date" id="tDate"><select id="tVendor"></select>
+      <input id="tItem" placeholder="事項" style="flex:1;min-width:200px">
+      <button class="btn ghost" id="tAdd">新增</button>
+    </div>
+  </div>
+
+  <div class="card"><h2>會議紀錄</h2><div id="meet"></div>
+    <div class="add">
+      <input type="date" id="mDate"><select id="mVendor"></select>
+      <input class="num" id="mHours" type="number" step="0.5" min="0" value="1" title="小時">
+      <textarea id="mNotes" placeholder="內容（一行一項）"></textarea>
+      <button class="btn ghost" id="mAdd">新增</button>
+    </div>
+  </div>
+
+  <div class="card"><h2>給錢紀錄</h2><div id="pay"></div>
+    <div class="add">
+      <input type="date" id="pDate"><input id="pVendor" placeholder="廠商" list="vlist">
+      <select id="pItem"><option>前半</option><option>後半</option><option>會議加價</option><option>其他</option></select>
+      <input class="num" id="pAmt" type="number" value="1000" step="100">
+      <select id="pPaid"><option value="0">待給</option><option value="1">已給</option></select>
+      <button class="btn ghost" id="pAdd">新增</button>
+    </div>
+  </div>
+  <datalist id="vlist"></datalist>
+</div>
+
+<div class="bar" id="bar" hidden>
+  <span id="msg"></span>
+  <a href="./" target="_blank">看網頁</a>
+  <button class="btn" id="save">儲存上線</button>
+</div>
+
+<script>
+const REPO = "zz12777/progress_itri", FILE = "data.js", BRANCH = "main";
+const API = `https://api.github.com/repos/${REPO}/contents/${FILE}`;
+const $ = id => document.getElementById(id);
+const md = d => { const [, m, day] = d.split("-"); return +m + "/" + +day; };
+const today = () => new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+let D, sha, token = localStorage.getItem("gh_token") || "";
+
+const b64dec = b => new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\n/g, "")), c => c.charCodeAt(0)));
+const b64enc = s => { const u = new TextEncoder().encode(s); let r = ""; u.forEach(x => r += String.fromCharCode(x)); return btoa(r); };
+const hdr = () => ({ Authorization: "Bearer " + token, Accept: "application/vnd.github+json" });
+
+function msg(t, cls = "") { $("msg").textContent = t; $("msg").className = cls; }
+function dirty(on = true) { document.body.classList.toggle("dirty", on); if (on) msg("尚未儲存"); }
+
+async function load() {
+  const r = await fetch(API + "?ref=" + BRANCH + "&t=" + Date.now(), { headers: hdr() });
+  if (!r.ok) throw r.status;
+  const j = await r.json();
+  sha = j.sha;
+  const txt = b64dec(j.content);
+  D = JSON.parse(txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1));
+}
+
+async function save() {
+  msg("儲存中…");
+  D.updated = today();
+  const body = "const DATA = " + JSON.stringify(D, null, 2) + ";\n";
+  const r = await fetch(API, {
+    method: "PUT", headers: hdr(),
+    body: JSON.stringify({ message: "更新 " + D.updated, content: b64enc(body), sha, branch: BRANCH })
+  });
+  if (r.ok) { sha = (await r.json()).content.sha; dirty(false); msg("已上線，約 1 分鐘後網頁更新", "good"); }
+  else if (r.status === 409) msg("資料已在別處被改過，請重新整理頁面", "err");
+  else msg("儲存失敗（" + r.status + "）", "err");
+}
+
+const tagBtn = (on, a, b, attr) => `<button class="tag ${on ? "ok" : "wait"}" ${attr}>${on ? a : b}</button>`;
+const delBtn = attr => `<button class="del" ${attr} title="刪除">✕</button>`;
+
+function render() {
+  const vNames = D.vendors.map(v => v.name);
+  const opts = list => list.map(n => `<option>${esc(n)}</option>`).join("");
+  ["tVendor"].forEach(id => $(id).innerHTML = opts(vNames));
+  $("mVendor").innerHTML = opts(["內部", ...vNames]);
+  $("vlist").innerHTML = opts(vNames);
+
+  $("prog").innerHTML = `<table><tr><th>廠商</th>${D.stages.map(s => `<th>${s}</th>`).join("")}<th>線上會議</th><th></th></tr>
+    ${D.vendors.map((v, i) => {
+      const c = D.meetings.filter(m => m.vendor === v.name).length;
+      return `<tr><td><b>${esc(v.name)}</b></td>
+      ${v.progress.map((p, k) => `<td>${tagBtn(p, "冠竹完成", "待完成", `data-a="prog" data-i="${i}" data-k="${k}"`)}</td>`).join("")}
+      <td style="${c > 2 ? "color:var(--bad);font-weight:600" : ""}">${c} / 2</td>
+      <td>${delBtn(`data-a="delV" data-i="${i}"`)}</td></tr>`;
+    }).join("")}</table>`;
+
+  const idx = (arr, key) => arr.map((x, i) => [x, i]).sort((a, b) => b[0].date.localeCompare(a[0].date));
+
+  $("todo").innerHTML = `<table><tr><th>日期</th><th>廠商</th><th>事項</th><th>狀態</th><th></th></tr>
+    ${idx(D.todos).sort((a, b) => a[0].done - b[0].done).map(([t, i]) => `<tr><td>${md(t.date)}</td><td>${esc(t.vendor)}</td><td class="wrapc">${esc(t.item)}</td>
+      <td>${tagBtn(t.done, "冠竹完成", "待完成", `data-a="todo" data-i="${i}"`)}</td><td>${delBtn(`data-a="delT" data-i="${i}"`)}</td></tr>`).join("")}</table>`;
+
+  $("meet").innerHTML = `<table><tr><th>日期</th><th>對象</th><th>小時</th><th>內容</th><th></th></tr>
+    ${idx(D.meetings).map(([m, i]) => `<tr><td>${md(m.date)}</td><td>${esc(m.vendor)}</td><td>${m.hours}</td>
+      <td class="wrapc">${m.notes.map(esc).join("<br>")}</td><td>${delBtn(`data-a="delM" data-i="${i}"`)}</td></tr>`).join("")}</table>`;
+
+  $("pay").innerHTML = `<table><tr><th>日期</th><th>廠商</th><th>項目</th><th>金額</th><th>狀態</th><th></th></tr>
+    ${idx(D.payments).map(([p, i]) => `<tr><td>${md(p.date)}</td><td>${esc(p.vendor)}</td><td>${esc(p.item)}</td><td>$${p.amount.toLocaleString("en-US")}</td>
+      <td>${tagBtn(p.paid, "已給", "待給", `data-a="pay" data-i="${i}"`)}</td><td>${delBtn(`data-a="delP" data-i="${i}"`)}</td></tr>`).join("")}</table>`;
+}
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-a]"); if (!b) return;
+  const i = +b.dataset.i, a = b.dataset.a;
+  if (a === "prog") { const v = D.vendors[i]; v.progress[+b.dataset.k] ^= 1; }
+  else if (a === "todo") D.todos[i].done = !D.todos[i].done;
+  else if (a === "pay") D.payments[i].paid = !D.payments[i].paid;
+  else {
+    const map = { delV: ["vendors", "廠商"], delT: ["todos", "待辦"], delM: ["meetings", "會議"], delP: ["payments", "給錢紀錄"] }[a];
+    if (!confirm("刪除這筆" + map[1] + "？")) return;
+    D[map[0]].splice(i, 1);
+  }
+  render(); dirty();
+});
+
+const need = (...ids) => ids.every(id => $(id).value.trim()) || (msg("請填完整", "err"), false);
+
+$("vAdd").onclick = () => { if (!need("vName")) return;
+  D.vendors.push({ name: $("vName").value.trim(), progress: D.stages.map(() => 0) }); $("vName").value = ""; render(); dirty(); };
+$("tAdd").onclick = () => { if (!need("tDate", "tItem")) return;
+  D.todos.push({ date: $("tDate").value, vendor: $("tVendor").value, item: $("tItem").value.trim(), done: false }); $("tItem").value = ""; render(); dirty(); };
+$("mAdd").onclick = () => { if (!need("mDate", "mNotes")) return;
+  D.meetings.push({ date: $("mDate").value, vendor: $("mVendor").value, hours: +$("mHours").value || 1,
+    notes: $("mNotes").value.split("\n").map(s => s.trim()).filter(Boolean) }); $("mNotes").value = ""; render(); dirty(); };
+$("pAdd").onclick = () => { if (!need("pDate", "pVendor", "pAmt")) return;
+  D.payments.push({ date: $("pDate").value, vendor: $("pVendor").value.trim(), item: $("pItem").value, amount: +$("pAmt").value, paid: $("pPaid").value === "1" });
+  $("pVendor").value = ""; render(); dirty(); };
+$("save").onclick = save;
+window.addEventListener("beforeunload", e => { if (document.body.classList.contains("dirty")) e.preventDefault(); });
+
+async function start() {
+  ["tDate", "mDate", "pDate"].forEach(id => $(id).value = today());
+  if (!token) { $("login").hidden = false; return; }
+  try {
+    await load();
+    $("login").hidden = true; $("app").hidden = false; $("bar").hidden = false;
+    render();
+  } catch (s) {
+    localStorage.removeItem("gh_token"); token = "";
+    $("login").hidden = false;
+    $("loginMsg").textContent = s === 401 || s === 403 || s === 404 ? "Token 無效或沒有權限" : "連線失敗";
+  }
+}
+$("tokSave").onclick = () => { token = $("tok").value.trim(); if (!token) return;
+  localStorage.setItem("gh_token", token); $("loginMsg").textContent = ""; start(); };
+start();
+</script>
+</body>
+</html>
