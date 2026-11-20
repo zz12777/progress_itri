@@ -31,9 +31,9 @@ const DATA = {
     {
       "name": "老獵人",
       "progress": [
-        0,
-        0,
-        0,
+        1,
+        1,
+        1,
         0,
         0
       ]
@@ -41,9 +41,9 @@ const DATA = {
     {
       "name": "京旺",
       "progress": [
-        0,
-        0,
-        0,
+        1,
+        1,
+        1,
         0,
         0
       ]
@@ -51,7 +51,7 @@ const DATA = {
     {
       "name": "鼎珍食品",
       "progress": [
-        0,
+        1,
         0,
         0,
         0,
@@ -105,13 +105,6 @@ const DATA = {
       "item": "前半",
       "amount": 1000,
       "paid": true
-    },
-    {
-      "date": "2026-11-20",
-      "vendor": "京旺、老獵人",
-      "item": "前半",
-      "amount": 2000,
-      "paid": false
     }
   ]
 };
