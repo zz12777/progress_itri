@@ -80,14 +80,14 @@ const DATA = {
       "date": "2026-11-20",
       "vendor": "京旺",
       "item": "前半報告上傳網頁",
-      "done": false,
+      "done": true,
       "due": "2026-11-24"
     },
     {
       "date": "2026-11-20",
       "vendor": "老獵人",
       "item": "前半報告上傳網頁",
-      "done": false,
+      "done": true,
       "due": "2026-11-24"
     },
     {
@@ -112,6 +112,14 @@ const DATA = {
         "恆源 前半"
       ],
       "amount": 1000
+    },
+    {
+      "date": "2026-11-22",
+      "items": [
+        "老獵人 前半",
+        "京旺 前半"
+      ],
+      "amount": 2000
     }
   ]
 };
